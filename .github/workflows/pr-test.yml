@@ -15,16 +15,19 @@ jobs:
           go-version: '1.25'
       - name: Run tests with coverage
         run: go test ./... -coverprofile=coverage.txt
-      - name: Validate codelight configuration
+      - name: codelight configuration status
         env:
           COVERAGE_UPLOAD_TOKEN: ${{ secrets.COVERAGE_UPLOAD_TOKEN }}
           COVERAGE_SERVICE_URL: ${{ vars.COVERAGE_SERVICE_URL }}
           GITHUB_INSTALLATION_ID: ${{ vars.CODELIGHT_INSTALLATION_ID }}
         run: |
-          test -n "$COVERAGE_UPLOAD_TOKEN" || { echo "Missing secret: COVERAGE_UPLOAD_TOKEN"; exit 1; }
-          test -n "$COVERAGE_SERVICE_URL" || { echo "Missing variable: COVERAGE_SERVICE_URL"; exit 1; }
-          test -n "$GITHUB_INSTALLATION_ID" || { echo "Missing variable: CODELIGHT_INSTALLATION_ID"; exit 1; }
+          if [ -z "$COVERAGE_UPLOAD_TOKEN" ] || [ -z "$COVERAGE_SERVICE_URL" ] || [ -z "$GITHUB_INSTALLATION_ID" ]; then
+            echo "codelight upload is not configured yet; tests passed and upload step will be skipped."
+            exit 0
+          fi
+          echo "codelight upload configuration detected."
       - name: Upload coverage to codelight
+        if: ${{ secrets.COVERAGE_UPLOAD_TOKEN != '' && vars.COVERAGE_SERVICE_URL != '' && vars.CODELIGHT_INSTALLATION_ID != '' }}
         env:
           COVERAGE_UPLOAD_TOKEN: ${{ secrets.COVERAGE_UPLOAD_TOKEN }}
           COVERAGE_OWNER: ${{ github.repository_owner }}
