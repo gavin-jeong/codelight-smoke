@@ -1,0 +1,40 @@
+name: codelight-pr-test
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.25'
+      - name: Run tests with coverage
+        run: go test ./... -coverprofile=coverage.txt
+      - name: Upload coverage to codelight
+        env:
+          COVERAGE_UPLOAD_TOKEN: ${{ secrets.COVERAGE_UPLOAD_TOKEN }}
+          COVERAGE_OWNER: ${{ github.repository_owner }}
+          COVERAGE_REPO: ${{ github.event.repository.name }}
+          COVERAGE_SHA: ${{ github.sha }}
+          COVERAGE_BRANCH: ${{ github.ref_name }}
+          COVERAGE_PULL: ${{ github.event.pull_request.number }}
+          COVERAGE_SERVICE_URL: https://platform-tools.sbtools.io/codelight
+          GITHUB_INSTALLATION_ID: ${{ vars.CODELIGHT_INSTALLATION_ID }}
+        run: |
+          curl -fsS -X POST "$COVERAGE_SERVICE_URL/api/uploads" \
+            -H "Authorization: Bearer $COVERAGE_UPLOAD_TOKEN" \
+            -F owner="$COVERAGE_OWNER" \
+            -F repo="$COVERAGE_REPO" \
+            -F commit_sha="$COVERAGE_SHA" \
+            -F branch="$COVERAGE_BRANCH" \
+            -F pull_number="$COVERAGE_PULL" \
+            -F installation_id="$GITHUB_INSTALLATION_ID" \
+            -F format="go-cover" \
+            -F flags="sandbox" \
+            -F components="smoke" \
+            -F coverage=@"coverage.txt"
