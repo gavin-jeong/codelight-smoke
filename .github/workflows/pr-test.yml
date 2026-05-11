@@ -1,9 +1,10 @@
 name: codelight-pr-test
 
 on:
-  pull_request:
+  pull_request: {}
   push:
-    branches: [main]
+    branches:
+      - main
 
 jobs:
   test:
@@ -27,7 +28,7 @@ jobs:
           fi
           echo "codelight upload configuration detected."
       - name: Upload coverage to codelight
-        if: ${{ secrets.COVERAGE_UPLOAD_TOKEN != '' && vars.COVERAGE_SERVICE_URL != '' && vars.CODELIGHT_INSTALLATION_ID != '' }}
+        if: ${{ env.COVERAGE_UPLOAD_TOKEN != '' && env.COVERAGE_SERVICE_URL != '' && env.GITHUB_INSTALLATION_ID != '' }}
         env:
           COVERAGE_UPLOAD_TOKEN: ${{ secrets.COVERAGE_UPLOAD_TOKEN }}
           COVERAGE_OWNER: ${{ github.repository_owner }}
