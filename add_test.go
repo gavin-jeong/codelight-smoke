@@ -9,3 +9,5 @@ func TestAdd(t *testing.T) {
 }
 
 // codelight-rerun
+
+// token-rerun
