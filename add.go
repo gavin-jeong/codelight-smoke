@@ -7,3 +7,5 @@ func Add(left int, right int) int {
 // smoke-change
 
 // parrot-sync-rerun
+
+// final-rerun
