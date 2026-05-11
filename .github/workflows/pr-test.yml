@@ -38,7 +38,7 @@ jobs:
           COVERAGE_SERVICE_URL: ${{ vars.COVERAGE_SERVICE_URL }}
           GITHUB_INSTALLATION_ID: ${{ vars.CODELIGHT_INSTALLATION_ID }}
         run: |
-          curl -fsS -X POST "$COVERAGE_SERVICE_URL/api/uploads" \
+          curl -fsS -X POST "$COVERAGE_SERVICE_URL/uploads" \
             -H "Authorization: Bearer $COVERAGE_UPLOAD_TOKEN" \
             -F owner="$COVERAGE_OWNER" \
             -F repo="$COVERAGE_REPO" \
